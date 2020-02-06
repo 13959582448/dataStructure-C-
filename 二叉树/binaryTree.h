@@ -5,6 +5,7 @@
 #include<iostream>
 #include"../队列/queue.h" //导入之前写过的队列
 using namespace std;
+#include<vector>
 
 template<typename T> //树的节点
 class node
@@ -26,12 +27,13 @@ public:
 
     node<T>* create(); //层次创建
     inline void print(node<T>*); //方便打印
-    void preTraverse(node<T>*); //先序遍历
-    void inTraverse(node<T>*); //中序遍历
-    void postTraverse(node<T>*); //后序遍历
-    void traverse(node<T>*); //层次遍历
+    void preOrder(node<T>*); //先序遍历
+    void inOrder(node<T>*); //中序遍历
+    void postOrder(node<T>*); //后序遍历
+    void Order(node<T>*); //层次遍历
     void destroyTree(node<T>*); //销毁树
     size_t getDepth(node<T>*); //求深度
+    node<T>* createTreeBypreAndin(T* pre,T* in,int& preStart,int preEnd,int inStart,int inEnd); //先序和中序生成树
 
     ~binaryTree();
 };
@@ -94,44 +96,44 @@ inline void binaryTree<T>::print(node<T> *n) //方便打印的函数
 }
 
 template<typename T>
-void binaryTree<T>::preTraverse(node<T>* n) //先序遍历
+void binaryTree<T>::preOrder(node<T>* n) //先序遍历
 {
     if(n)
     {
         print(n); //先本节点
-        preTraverse(n->lchild); //然后子树
-        preTraverse(n->rchild); //最后右子树
+        preOrder(n->lchild); //然后子树
+        preOrder(n->rchild); //最后右子树
     }
 }
 
 template<typename T>
-void binaryTree<T>::inTraverse(node<T>* n) //中序遍历
+void binaryTree<T>::inOrder(node<T>* n) //中序遍历
 {
     if(n)
     {
-        inTraverse(n->lchild); //先左子树
+        inOrder(n->lchild); //先左子树
         print(n); //然后本节点
-        inTraverse(n->rchild); //最后右子树
+        inOrder(n->rchild); //最后右子树
     }
 }
 
 template<typename T>
-void binaryTree<T>::postTraverse(node<T>* n) //后序遍历
+void binaryTree<T>::postOrder(node<T>* n) //后序遍历
 {
     if(n)
     {
-        postTraverse(n->rchild); //先右子树
-        postTraverse(n->lchild); //然后左子树
+        postOrder(n->rchild); //先右子树
+        postOrder(n->lchild); //然后左子树
         print(n); //最后本节点
     }
 }
 
 template<typename T>
-void binaryTree<T>::traverse(node<T>* n) //层次遍历
+void binaryTree<T>::Order(node<T>* n) //层次遍历
 {
     node<T>* tmp;
     queue<node<T>* > q(100); //这个可以看我写过的队列的定义
-    q.enQueue(root);
+    q.enQueue(n);
     while(!q.isEmpty()) //队列不为空
     {
         q.deQueue(tmp);
@@ -154,9 +156,12 @@ size_t binaryTree<T>::getDepth(node<T> *n)
 template<typename T>
 void binaryTree<T>::destroyTree(node<T>* n) //销毁树
 {
-    if(n->lchild) destroyTree(n->lchild); //删除左子树
-    if(n->rchild) destroyTree(n->rchild); //删除右子树
-    delete n;
+    if(n)
+    {
+        if(n->lchild) destroyTree(n->lchild); //删除左子树
+        if(n->rchild) destroyTree(n->rchild); //删除右子树
+        delete n;
+    }
 
 }
 
@@ -164,4 +169,31 @@ template<typename T>
 binaryTree<T>::~binaryTree() //析构函数
 {
     destroyTree(root);
+}
+
+template<typename T>
+node<T>* binaryTree<T>::createTreeBypreAndin(T* pre,T* in,int& preStart,int preEnd,int inStart,int inEnd)
+ //preStart需要设置为引用
+ //pre代表先序数组，in代表中序数组
+{
+    if(inStart==inEnd) return new node<T>(in[inStart]); //只剩一个节点
+    if(inStart>inEnd) return nullptr; //这两行是终止条件
+
+    T search=pre[preStart]; //查找结点
+    int i=inStart;
+    node<T>* ans=new node<T>(pre[preStart]);
+    while(i<=inEnd&&in[i]!=search) //找到
+        i++;
+    if(i>inEnd) //没找到 
+    {
+        fprintf(stderr,"wrong input");
+        return nullptr;
+    }
+    else
+    {
+        ans->lchild=createTreeBypreAndin(pre,in,++preStart,preEnd,inStart,i-1); //构建左子树
+        ans->rchild=createTreeBypreAndin(pre,in,++preStart,preEnd,i+1,inEnd); //构建右子树
+    }    
+    return ans; //返回节点
+
 }
