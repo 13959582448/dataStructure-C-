@@ -39,7 +39,7 @@ public:
 };
 
 template<typename T>
-bool BSTree<T>::insertNode(BSTnode<T>*& node,const T v) //插入节点
+bool BSTree<T>::insertNode(BSTnode<T>*& node,const T v) //插入节点 "引用"指针
 {
     if(!node) //空
     {
