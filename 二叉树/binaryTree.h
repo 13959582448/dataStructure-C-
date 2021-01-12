@@ -191,8 +191,8 @@ node<T>* binaryTree<T>::createTreeBypreAndin(T* pre,T* in,int& preStart,int preE
     }
     else
     {
-        ans->lchild=createTreeBypreAndin(pre,in,++preStart,preEnd,inStart,i-1); //构建左子树
-        ans->rchild=createTreeBypreAndin(pre,in,++preStart,preEnd,i+1,inEnd); //构建右子树
+        ans->lchild=createTreeBypreAndin(pre,in,preStart+1,preEnd,inStart,i-1); //构建左子树
+        ans->rchild=createTreeBypreAndin(pre,in,preStart+i-inStart+1,preEnd,i+1,inEnd); //构建右子树
     }    
     return ans; //返回节点
 
